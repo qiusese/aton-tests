@@ -44,14 +44,25 @@ class HomePage(Base):
     next_step_btn = (By.ID, 'sc_next')
     submit_btn = (By.ID, 'sbtn_submit')
     delete_wallet_btn = (By.ID, 'tv_delete')
+    cancel_install_btn = (By.ID, 'text_cancel')
 
-    def delete_wallet(self, pwd):
-        # 删除钱包
-        self.click_element(self.delete_wallet_btn, mark='删除钱包')
-        self.pwd_author(pwd)
+    def cancel_install(self):
+        self.click_element(self.cancel_install_btn, mark='跳过升级')
 
-    def backup_wallet(self, pwd):
-        # 备份钱包
+    def get_wallet_msg(self, pwd) -> dict:
+        # 获取钱包的地址、私钥、keystore、助记词
+        wallet_msg = {'address': '', 'private_key': '', 'keystore': '', 'mnen': ''}
+
+        self.click_element(self.manage_wallet_btn, mark='钱包管理')
+        wallet_msg['address'] = self.get_text(self.wallet_address_text)
+        self.click_element(self.back_btn, mark='返回')
+        wallet_msg['private_key'] = self.export_private_key(pwd)
+        wallet_msg['keystore'] = self.export_keystore(pwd)
+        wallet_msg['mnen'] = self.export_mnemonic(pwd)
+        return wallet_msg
+
+    def export_mnemonic(self, pwd) -> list:
+        # 导出助记词
         if self.element_display(self.home_backup_wallet_btn):  # 如果首页有备份按钮
             self.click_element(self.home_backup_wallet_btn, mark='点击首页的备份按钮')
         else:
@@ -66,6 +77,16 @@ class HomePage(Base):
             words.append(loc_text)
         self.click_element(self.next_step_btn, mark='下一步')
         time.sleep(1)
+        return words
+
+    def delete_wallet(self, pwd):
+        # 删除钱包
+        self.click_element(self.delete_wallet_btn, mark='删除钱包')
+        self.pwd_author(pwd)
+
+    def backup_wallet(self, pwd):
+        # 备份钱包
+        words = self.export_mnemonic(pwd)
 
         for i in words:
             self.click_text(i)  # 点击助记词
@@ -76,6 +97,7 @@ class HomePage(Base):
     def export_private_key(self, pwd) -> str:
         # 导出私钥
         self.click_element(self.manage_wallet_btn, mark='钱包管理')
+        time.sleep(0.5)
         self.click_element(self.export_privatekey_btn, mark='导出私钥')
         self.pwd_author(pwd)
         text_loc = self.get_text(self.privatekey_text)
@@ -196,6 +218,11 @@ class HomePage(Base):
         self.input_element(self.pwd_btn, new_pwd, mark='输入新的密码')
         self.input_element(self.edit_repeat_pwd_input, new_pwd, mark='确认密码')
         self.click_element(self.confirm_btn, mark='确认')
+
+    def cancel_backup(self):
+        # 取消备份钱包
+        self.click_element(self.back_btn, mark='返回')
+        self.click_element(self.confirm_btn, mark='确定')
 
     # def switch_envi(self, enviroment):
     #     """切换环境，默认platon主网"""

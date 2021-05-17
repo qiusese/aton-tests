@@ -170,7 +170,7 @@ class Base:
         logger.info('向下滑动')
         self.driver.execute_script('mobile: swipe', {'direction': 'down'})
 
-    def is_toast_exist(self, text, duration=10, frequency=0.1):
+    def is_toast_exist(self, text, duration=5, frequency=0.1):
         """
         定位toast提示语
         :param text: 提示语内容（全部）

@@ -12,6 +12,7 @@ class GenesisPage(Base):
     confirm_contract_btn = (By.ID, 'sbtn_next')
     switch_env_btn = (By.ID, 'layout_node_setting')
     env_btn = (By.ID, 'tv_node_name')
+    observer_input = (By.ID, 'et_observed')
     collect_btn = (By.ID, 'tv_title')
     create_wallet_btn = (By.ID, 'sc_create_wallet')
     import_wallet_btn = (By.ID, 'sc_import_wallet')
@@ -20,16 +21,18 @@ class GenesisPage(Base):
     HD_wallet_btn = (By.ID, 'tv_switch_hd')
     left_back_btn = (By.ID, 'iv_left')
     wallet_name_input = (By.ID, 'et_name')
+    privatekey_input = (By.ID, 'et_private_key')
     pwd_input = (By.ID, 'et_password')
     confirm_pwd_input = (By.ID, 'et_repeat_password')
     set_address_btn = (By.ID, 'iv_wallet_address_select')
     complete_create_btn = (By.ID, 'sbtn_create')
     complete_import_btn = (By.ID, 'sbtn_import')
-
+    keystore_input = (By.ID, 'et_keystore')
     start_backup_btn = (By.ID, 'sc_start_backup')
     skip_backup_btn = (By.ID, 'll_skip')
     confirm_btn = (By.ID, 'button_confirm')
     next_step_btn = (By.ID, 'sc_next')
+    complete_wallet_btn = (By.ID, 'sbtn_finish')
     mnemonic_btn = (By.ID, 'et_mnemonic1')
 
     def finish_contract(self, con=True):
@@ -41,8 +44,14 @@ class GenesisPage(Base):
 
     def create_wallet(self):
         # 第二步：创建钱包
-        time.sleep(1)
+        time.sleep(0.5)
         self.click_element(self.create_wallet_btn, mark='创建钱包')
+
+    def import_wallet(self):
+        # 第二步：导入钱包
+        self.click_element(self.import_wallet_btn, mark='导入钱包')
+        time.sleep(0.5)
+        self.driver.tap([(234, 324), (438, 561)], 500)  # 点击屏幕
 
     def wallet_msg(self, name, pwd, HD=False, book=True):
         # 第三步：钱包信息
@@ -81,13 +90,29 @@ class GenesisPage(Base):
 
     def input_mnemonics(self, words: list):
         # 输入助记词
-        self.click_element(self.import_wallet_btn, mark='导入钱包')
-        time.sleep(0.5)
-        self.driver.tap([(234, 324), (438, 561)], 500)  # 点击屏幕
         for i in range(len(words)):
             mnemonic = (By.ID, f'et_mnemonic{i + 1}')
             self.input_element(mnemonic, words[i], mark='输入12个助记词')
             time.sleep(0.2)
+
+    def input_privatekey(self, pkey):
+        # 输入私钥
+        self.click_text('私钥')
+        self.input_element(self.privatekey_input, pkey, mark='输入私钥')
+
+    def input_keystore(self, ks):
+        # 输入Keystore
+        self.click_text('钱包文件(.json)')
+        self.input_element(self.keystore_input, ks, mark='输入keystore')
+
+    def input_observer(self, addr):
+        # 导入观察者钱包
+        self.click_text('观察钱包')
+        self.input_element(self.observer_input, addr, mark='输入观察者地址')
+        self.click_element(self.complete_wallet_btn, mark='点击完成')
+        if self.is_toast_exist('钱包已存在'):
+            print('钱包已存在！！！请勿重复导入.')
+            self.click_element(self.left_back_btn, mark='返回首页')
 
     def finish_import(self):
         # 第四步：完成导入
@@ -103,13 +128,13 @@ class GenesisPage(Base):
         self.click_element(self.switch_env_btn, mark='切换环境')
         env_list = self.find_Elements(self.env_btn, mark='环境列表')
         try:
-            if enviroment == 1:
+            if enviroment == 1:  # platon主网
                 env_list[0].click()
                 self.click_element(self.left_back_btn, mark='返回')
             elif enviroment == 3:
-                env_list[2].click()
+                env_list[2].click()  # Alaya主网
             else:
-                env_list[1].click()
+                env_list[1].click()  # platon开发网
         except BaseException:
             pass
 
