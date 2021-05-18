@@ -45,6 +45,7 @@ class HomePage(Base):
     submit_btn = (By.ID, 'sbtn_submit')
     delete_wallet_btn = (By.ID, 'tv_delete')
     cancel_install_btn = (By.ID, 'text_cancel')
+    observer_text = (By.ID, 'tv_observed_wallet_tag')
 
     def cancel_install(self):
         self.click_element(self.cancel_install_btn, mark='跳过升级')
@@ -99,7 +100,6 @@ class HomePage(Base):
         try:
             self.wait_element(el=self.manage_wallet_btn, duration=10, frequency=0.4).click()
             self.wait_element(el=self.export_privatekey_btn, duration=10, frequency=0.4).click()
-
         except:
             self.click_element(self.manage_wallet_btn, mark='钱包管理')
             self.click_element(self.export_privatekey_btn, mark='导出keystore')
@@ -224,6 +224,10 @@ class HomePage(Base):
         # 取消备份钱包
         self.click_element(self.back_btn, mark='返回')
         self.click_element(self.confirm_btn, mark='确定')
+
+    def check_observer_tag(self):
+        # 检测是否是观察者钱包
+        return self.element_display(self.observer_text)
 
     # def switch_envi(self, enviroment):
     #     """切换环境，默认platon主网"""

@@ -53,12 +53,13 @@ class GenesisPage(Base):
         time.sleep(0.5)
         self.driver.tap([(234, 324), (438, 561)], 500)  # 点击屏幕
 
-    def wallet_msg(self, name, pwd, HD=False, book=True):
+    def wallet_msg(self, name, pwd, HD=False, book=True, keystore=False):
         # 第三步：钱包信息
         self.select_wallet_type(HD)
         self.input_element(self.wallet_name_input, name, mark='输入钱包名')
         self.input_element(self.pwd_input, pwd, mark='输入密码')
-        self.input_element(self.confirm_pwd_input, pwd, mark='确认密码')
+        if not keystore:
+            self.input_element(self.confirm_pwd_input, pwd, mark='确认密码')
         self.add_address_book(book)
 
     def finish_create_wallet(self):
@@ -140,4 +141,4 @@ class GenesisPage(Base):
 
     def check_login_success(self):
         # 检测登录成功
-        return self.find_Element(self.collect_btn).is_enabled()
+        return self.element_display(self.collect_btn)
