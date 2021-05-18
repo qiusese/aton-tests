@@ -16,7 +16,7 @@ class HomePage(Base):
     wallet_list_btn = (By.ID, 'iv_wallet_switch')
     all_btn = (By.ID, 'btn_all')
     HD_btn = (By.ID, 'btn_hd')
-    normal_btn = (By.ID, 'btn_ordinary')
+    # normal_btn = (By.ID, 'btn_ordinary')
     wallet_item_btn = (By.ID, 'rl_item')
     edit_name_btn = (By.ID, 'tv_rename')
     pwd_btn = (By.ID, 'et_password')
@@ -96,9 +96,13 @@ class HomePage(Base):
 
     def export_private_key(self, pwd) -> str:
         # 导出私钥
-        self.click_element(self.manage_wallet_btn, mark='钱包管理')
-        time.sleep(0.5)
-        self.click_element(self.export_privatekey_btn, mark='导出私钥')
+        try:
+            self.wait_element(el=self.manage_wallet_btn, duration=10, frequency=0.4).click()
+            self.wait_element(el=self.export_privatekey_btn, duration=10, frequency=0.4).click()
+
+        except:
+            self.click_element(self.manage_wallet_btn, mark='钱包管理')
+            self.click_element(self.export_privatekey_btn, mark='导出keystore')
         self.pwd_author(pwd)
         text_loc = self.get_text(self.privatekey_text)
         self.back_homepage()
@@ -127,40 +131,37 @@ class HomePage(Base):
         time.sleep(0.5)
         self.click_element(self.back_btn, mark='返回')
 
-    # def wallet_name_lsit(self):
-    #     """
-    #     返回钱包列表名字（配  合HD钱包Index使用）
-    #     """
-    #     name_list = self.find_Elements(self.wallet_name_list_btn, mark='找到HD钱包列表')
-    #     # name_list_text = [i for i in name_list]
-    #     for i in name_list:
-    #         name_list[i].click()
-
     def traverse_HDwallet_privatekey(self, pwd):
         """遍历HD钱包的私钥"""
         for i in range(6):
             self.click_element(self.wallet_list_btn, mark='选择钱包')
-            self.click_element(self.HD_btn, mark='选择HD钱包List')
-            hd_list = self.find_Elements(self.wallet_item_btn, mark='找出当前页面的HD钱包list')
-            hd_list[i].click()
-            time.sleep(1)
+            self.wait_element(el=self.HD_btn, duration=2, frequency=0.4).click()
+            try:
+                hd_list = self.find_Elements(self.wallet_item_btn, mark='找出当前页面的HD钱包list')
+                hd_list[i].click()
+            except IndexError:
+                pass
+            # time.sleep(1)
             yield self.export_private_key(pwd)
 
     def traverse_HDwallet_keystore(self, pwd):
         """遍历HD钱包的keystore"""
         for i in range(6):
             self.click_element(self.wallet_list_btn, mark='选择钱包')
-            self.click_element(self.HD_btn, mark='选择HD钱包List')
-            hd_list = self.find_Elements(self.wallet_item_btn, mark='找出当前页面的HD钱包list')
-            hd_list[i].click()
-            time.sleep(1)
+            self.wait_element(el=self.HD_btn, duration=2, frequency=0.4).click()
+            try:
+                hd_list = self.find_Elements(self.wallet_item_btn, mark='找出当前页面的HD钱包list')
+                hd_list[i].click()
+            except IndexError:
+                pass
+            # time.sleep(1)
             yield self.export_keystore(pwd)
 
     def swipe_wallet_list(self):
         """HD钱包地址列表下，滑动"""
         self.click_element(self.wallet_list_btn, mark='选择钱包')
-        self.click_element(self.HD_btn, mark='选择HD钱包List')
-        self.swipe_up()
+        self.wait_element(el=self.HD_btn, duration=2, frequency=0.4).click()
+        self.swipe_up(duration=1000)
         time.sleep(2)
 
     def import_by_privatekey(self, pkey):

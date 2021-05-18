@@ -9,7 +9,10 @@ import os
 
 
 class TestMock:
-    """自动化第一期"""
+    """
+    自动化第一期
+    ：：37条testcase，耗时43mins左右
+    """
 
     def setup_method(self):
         # Base.android_driver_caps["noReset"] = True
@@ -21,16 +24,22 @@ class TestMock:
     def teardown_method(self):
         self.driver.quit()
 
-    @pytest.mark.parametrize("HD,w_name,clear", [(True, 'name', True), (False, 'dev_name', False)],
-                             ids=['HD钱包', '普通钱包'])
-    def test_01_get_wallet_msg(self, HD, w_name, clear):
+    @pytest.mark.parametrize("HD,w_name,clear,env", [
+        (True, 'mainnet_HD', True, 1), (False, 'mainnet', False, 1),
+        (True, 'dev_HD', False, 2), (False, 'dev', False, 2),
+        (True, 'alaya_HD', False, 3), (False, 'alaya', False, 3)],
+                             ids=['platon主网-HD钱包', 'platon主网-普通钱包',
+                                  'platon测试网-HD钱包', 'platon测试网-普通钱包',
+                                  'alaya网-HD钱包', 'alaya网-普通钱包'])
+    def test_01_get_wallet_msg(self, HD, w_name, clear, env):
         """
-        platon主网
-        1.获取新版本HD钱包的地址、私钥、助记词、keystore;写入到data.global_var.name中
-        2.获取新版本普通钱包的地址、私钥、助记词、keystore;写入到data.global_var.dev_name中
+        三种不同的环境下
+        1.获取新版本HD钱包的地址、私钥、助记词、keystore;写入到data.global_var中
+        2.获取新版本普通钱包的地址、私钥、助记词、keystore;写入到data.global_var中
         """
         # 第一步创建一个HD钱包
         self.genesis_page.finish_contract()
+        self.genesis_page.switch_env(enviroment=env)
         self.genesis_page.create_wallet()
         self.genesis_page.wallet_msg('test', password, HD=HD)  # 是否硬钱包
         self.genesis_page.finish_create_wallet()
@@ -49,79 +58,104 @@ class TestMock:
         self.driver.remove_app(Base.android_driver_caps['appPackage'])
         self.driver.install_app(os.path.abspath(os.path.join(os.getcwd(), "../data/Aton1.0.0.apk")))
 
-    @pytest.mark.parametrize("env", [1, 2], ids=['platon主网', 'platon开发网'])
-    def test_03_import_wallet_by_mnemonic(self, random_text, env):
+    from data import global_var as g  # 导入全局变量
+
+    @pytest.mark.parametrize("env,source", [
+        (1, g.mainnet_HD), (2, g.mainnet_HD),
+        (2, g.dev_HD), (1, g.dev_HD),
+        (3, g.alaya_HD)],
+                             ids=['platon主网->platon主网', 'platon主网->platon开发网',
+                                  'platon开发网->platon开发网', 'platon开发网->platon主网',
+                                  'alaya网->alaya网'])
+    def test_03_import_wallet_by_mnemonic(self, random_text, env, source):
         """
-        1.platon主网-老版本，通过助记词导入钱包
-        2.platon开发-老版本，通过助记词导入钱包
+        1.老版本，通过助记词导入(普通)钱包
         """
-        from data.global_var import name
         self.genesis_page.finish_contract()
         self.genesis_page.switch_env(enviroment=env)
         self.genesis_page.import_wallet()
-        self.genesis_page.input_mnemonics(name['mnen'])
-        self.genesis_page.wallet_msg(name=random_text, pwd=password, HD=False)
+        self.genesis_page.input_mnemonics(source['mnen'])
+        self.genesis_page.wallet_msg(name=random_text, pwd=password, HD=False)  # 普通钱包
         self.genesis_page.finish_import()
         self.home_page.cancel_install()
         assert self.genesis_page.check_login_success() is True
 
-    @pytest.mark.parametrize("env", [1, 2], ids=['platon主网', 'platon开发网'])
-    def test_04_import_wallet_by_privatekey(self, random_text, env):
+    @pytest.mark.parametrize("env,source", [
+        (1, g.mainnet_HD), (2, g.mainnet_HD),
+        (2, g.dev_HD), (1, g.dev_HD),
+        (3, g.alaya_HD)],
+                             ids=['platon主网->platon主网', 'platon主网->platon开发网',
+                                  'platon开发网->platon开发网', 'platon开发网->platon主网',
+                                  'alaya网->alaya网'])
+    def test_04_import_wallet_by_privatekey(self, random_text, env, source):
         """
-        1.platon主网-老版本，通过私钥导入钱包
-        2.platon开发网-老版本，通过私钥导入钱包
+        1.老版本，通过私钥导入钱包
         """
-        from data.global_var import name
         self.genesis_page.finish_contract()
         self.genesis_page.switch_env(enviroment=env)
         self.genesis_page.import_wallet()
-        self.genesis_page.input_privatekey(pkey=name['private_key'])
+        self.genesis_page.input_privatekey(pkey=source['private_key'])
         self.genesis_page.wallet_msg(random_text, password)
         self.genesis_page.finish_import()
         self.home_page.cancel_install()
         assert self.genesis_page.check_login_success() is True
 
-    @pytest.mark.parametrize("env", [1, 2], ids=['platon主网', 'platon开发网'])
-    def test_05_import_wallet_by_keystore(self, random_text, env):
+    @pytest.mark.parametrize("env,source", [
+        (1, g.mainnet_HD), (2, g.mainnet_HD),
+        (2, g.dev_HD), (1, g.dev_HD),
+        (3, g.alaya_HD)],
+                             ids=['platon主网->platon主网', 'platon主网->platon开发网',
+                                  'platon开发网->platon开发网', 'platon开发网->platon主网',
+                                  'alaya网->alaya网'])
+    def test_05_import_wallet_by_keystore(self, random_text, env, source):
         """
-        1.platon主网-老版本，通过keystore导入钱包
-        2.platon开发网-老版本，通过keystore导入钱包
+        1.老版本，通过keystore导入钱包
         """
-        from data.global_var import name
         self.genesis_page.finish_contract()
         self.genesis_page.switch_env(enviroment=env)
         self.genesis_page.import_wallet()
-        self.genesis_page.input_keystore(name['keystore'].strip('/'))
+        self.genesis_page.input_keystore(source['keystore'].strip('/'))
         self.genesis_page.wallet_msg(random_text, password)
         self.genesis_page.finish_import()
         self.home_page.cancel_install()
         assert self.genesis_page.check_login_success() is True
 
-    @pytest.mark.parametrize("env", [1, 2], ids=['platon主网', 'platon开发网'])
-    def test_06_import_wallet_by_observer(self, env):
+    @pytest.mark.parametrize("env,source", [
+        (1, g.mainnet_HD), (2, g.mainnet_HD),
+        (2, g.dev_HD), (1, g.dev_HD),
+        (3, g.alaya_HD)],
+                             ids=['platon主网->platon主网', 'platon主网->platon开发网',
+                                  'platon开发网->platon开发网', 'platon开发网->platon主网',
+                                  'alaya网->alaya网'])
+    def test_06_import_wallet_by_observer(self, env, source):
         """
         1.platon主网-老版本，通过地址导入观察者钱包
         2.platon测试网-老版本，通过地址导入观察者钱包
         """
-        from data.global_var import name
         self.genesis_page.finish_contract()
         self.genesis_page.switch_env(enviroment=env)
         self.genesis_page.import_wallet()
-        self.home_page.import_by_observer(addr=name['address'])
+        self.home_page.import_by_observer(addr=source['address'])
         self.home_page.cancel_install()
         assert self.genesis_page.check_login_success() is True
 
-    @pytest.mark.parametrize("env", [1, 2], ids=['platon主网', 'platon开发网'])
-    def test_07_import_HDwallet_by_mnemonic(self, random_text, env):
+    @pytest.mark.parametrize("env,source", [
+        (1, g.mainnet_HD), (2, g.mainnet_HD),
+        (2, g.dev_HD), (1, g.dev_HD),
+        (3, g.alaya_HD)],
+                             ids=['platon主网->platon主网', 'platon主网->platon开发网',
+                                  'platon开发网->platon开发网', 'platon开发网->platon主网',
+                                  'alaya网->alaya网'])
+    def test_07_import_HDwallet_by_mnemonic(self, random_text, env, source):
         """
-        1.platon主网-老版本，通过助记词导入成HD钱包
-        2.platon测试网-老版本，遍历HD30个钱包地址的私钥
+        1.老版本，通过助记词导入成HD钱包(耗时较久)
+        2.遍历HD地址的私钥
+        TODO：遍历时有问题，会重复1-15两次
         """
-        from data.global_var import name
         self.genesis_page.finish_contract()
         self.genesis_page.switch_env(enviroment=env)
         self.genesis_page.import_wallet()
-        self.genesis_page.input_mnemonics(name['mnen'])
+        self.genesis_page.input_mnemonics(source['mnen'])
         self.genesis_page.wallet_msg(name=random_text, pwd=password, HD=True)
         self.genesis_page.finish_import()
         self.home_page.cancel_install()
@@ -132,16 +166,21 @@ class TestMock:
                 set_global_atrr(key=f'pri_{i[0:4]}', value=i, truncate=False)
             self.home_page.swipe_wallet_list()
 
-    @pytest.mark.parametrize("env", [1, 2], ids=['platon主网', 'platon开发网'])
-    def test_08_normalwallet_to_HDwallet(self, random_text, env):
+    @pytest.mark.parametrize("env,source", [
+        (1, g.mainnet), (2, g.mainnet),
+        (2, g.dev), (1, g.dev),
+        (3, g.alaya)],
+                             ids=['platon主网->platon主网', 'platon主网->platon开发网',
+                                  'platon开发网->platon开发网', 'platon开发网->platon主网',
+                                  'alaya网->alaya网'])
+    def test_08_normalwallet_to_HDwallet(self, random_text, env, source):
         """
-        1.platon主网-老版本，创建一个普通钱包
-        1.platon测试网-老版本，创建一个普通钱包
+        1.老版本，创建一个普通钱包
         """
-        from data.global_var import dev_name
         self.genesis_page.finish_contract()
         self.genesis_page.switch_env(enviroment=env)
         self.genesis_page.import_wallet()
-        self.genesis_page.input_mnemonics(dev_name['mnen'])
+        self.genesis_page.input_mnemonics(source['mnen'])
         self.genesis_page.wallet_msg(random_text, password, HD=True)  # 是否硬钱包
         self.genesis_page.finish_import()
+        self.home_page.cancel_install()

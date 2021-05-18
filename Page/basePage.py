@@ -4,6 +4,7 @@ from selenium.webdriver.support import expected_conditions
 import selenium.common.exceptions as E
 from selenium.webdriver.common.by import By
 import time
+import os
 from loguru import logger
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -45,6 +46,7 @@ class Base:
             return self.driver.find_element(*el)
         except E.NoSuchElementException as e:
             logger.exception('查找元素失败.', e)
+            self.save_img(el[1])  # 找不到元素，截图
             raise
 
     def find_Elements(self, el, mark=None) -> WebElement:
@@ -126,12 +128,17 @@ class Base:
         x, y = self.get_size()
         self.driver.swipe(x / 2, y * 3 / 4, x / 2, y / 4, duration)
 
+    def Swipe(self, x1, y1, x2, y2, duration=500):
+        # 滑动
+        x, y = self.get_size()
+        self.driver.swipe(x * x1, y * y1, x * x2, y * y2, duration)
+
     def wait_element(self, duration, frequency, el) -> WebElement:
         """等待元素出现"""
         try:
             ele = WebDriverWait(self.driver, timeout=duration, poll_frequency=frequency).until(
                 expected_conditions.presence_of_element_located(el))
-            logger.info(f'等待元素{el}出现...时长:{duration},间隔:{frequency}')
+            logger.info(f'等待元素{el}出现...时长:{duration}s,间隔:{frequency}s')
             return ele
         except TimeoutError as e:
             logger.exception('查找元素超时.', e)
@@ -146,19 +153,13 @@ class Base:
         for i in range(0, text_Length):
             self.driver.keyevent(67)  # 逐个删除已输入的内容
 
-    # def save_img(self, picname):
-    #     """
-    #     截图并保存
-    #     :param filename:文件名
-    #     :使用例子：self.usercenterPage.save_img('/hello')
-    #     """
-    #
-    #     path = get_env('pictures', 'path')
-    #     filename = path + picname + '.png'
-    #     # print(filename)
-    #     self.driver.get_screenshot_as_file(filename)
-    #     file = open(filename, 'rb').read()
-    #     allure.attach(file, picname, allure.attachment_type.PNG)
+    def save_img(self, picname):
+        """截图并保存"""
+        filename = picname + '.png'
+        filepath = os.path.abspath(os.path.join(os.getcwd(), f"../images/{filename}"))
+        logger.exception(f'报错！！！截图路径：： {filepath}')
+        self.driver.get_screenshot_as_file(filepath)
+        return filepath
 
     def ios_swipe_up(self):
         """iOS端向上滑动"""
