@@ -1,17 +1,12 @@
 import time
-import platform
 import subprocess
 
 
 class AppiumServer:
-    """
-    管理appium服务
-    """
+    """（mac os）管理appium服务"""
 
     def start_server(self):
-        """
-        启动单个appium服务时
-        """
+        #  启动单个appium服务时
         try:
             print('启动Appium服务，默认aport=4723,bport=4724')
             subprocess.Popen('appium')  # mac_OS
@@ -26,17 +21,13 @@ class AppiumServer:
         """
         启动多个appium服务时,端口号建议输入4700～4800之间的，且两者不相同
         """
-
         print('启动Appium多个服务中...')
-        cmd = f'appium -a 127.0.0.1 -p {port} -bp {port+1} -U {device}'
+        cmd = f'appium -a 127.0.0.1 -p {port} -bp {port + 1} -U {device}'
         subprocess.Popen(cmd)
         time.sleep(5)
 
     def stop_server(self):
-        """
-        区分系统去停止服务
-        """
-
+        # 区分系统去停止服务
         p = subprocess.Popen('lsof -i:4723', stdout=subprocess.PIPE, shell=True)
         print('端口号为：', p.pid)
         if not p.pid:

@@ -5,6 +5,7 @@ import selenium.common.exceptions as E
 from selenium.webdriver.common.by import By
 import time
 import os
+import allure
 from loguru import logger
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -46,7 +47,7 @@ class Base:
             return self.driver.find_element(*el)
         except E.NoSuchElementException as e:
             logger.exception('查找元素失败.', e)
-            self.save_img(el[1])  # 找不到元素，截图
+            # self.save_img(el[1])  # 找不到元素，截图
             raise
 
     def find_Elements(self, el, mark=None) -> WebElement:
@@ -156,10 +157,16 @@ class Base:
     def save_img(self, picname):
         """截图并保存"""
         filename = picname + '.png'
-        filepath = os.path.abspath(os.path.join(os.getcwd(), f"../images/{filename}"))
+        filepath = os.path.abspath(os.path.join(os.getcwd(), f"./images/{filename}"))
         logger.exception(f'报错！！！截图路径：： {filepath}')
         self.driver.get_screenshot_as_file(filepath)
         return filepath
+
+    def allure_save_img(self, name):
+        """allure截图"""
+        with open(self.save_img(name), 'rb') as f:
+            file = f.read()
+        allure.attach(file, '失败截图', allure.attachment_type.PNG)
 
     def ios_swipe_up(self):
         """iOS端向上滑动"""
