@@ -27,6 +27,7 @@ class TestMock:
     def teardown_method(self):
         self.driver.quit()
 
+    @allure.title('三种不同环境下，获取钱包的信息')
     @pytest.mark.parametrize("HD,w_name,clear,env", [
         (True, 'mainnet_HD', True, 1), (False, 'mainnet', False, 1),
         (True, 'dev_HD', False, 2), (False, 'dev', False, 2),
@@ -54,20 +55,22 @@ class TestMock:
             # 第二步获取钱包的信息，并写入
             wallet_messages = self.home_page.get_wallet_msg(password)
             set_global_atrr(w_name, wallet_messages, truncate=clear)  # 设置全局变量
-        except:
+        finally:
             self.genesis_page.allure_save_img('test_01')
 
+    @allure.title('升级覆盖安装')
     def test_02_reinstall(self):
         """升级为新版本，覆盖安装"""
         try:
             # self.driver.remove_app(Base.android_driver_caps['appPackage'])
-            self.driver.install_app(os.path.abspath(os.path.join(os.getcwd(), "./data/Aton1.0.1.apk")))
+            self.driver.install_app(os.path.abspath(os.path.join(os.path.dirname(__file__), "../data/Aton1.0.1.apk")))
             assert self.genesis_page.is_toast_exist('正在自动升级')
-        except:
+        finally:
             self.genesis_page.allure_save_img('test_02')
 
     from data import global_var as g  # 导入全局变量
 
+    @allure.title('通过助记词导入成普通钱包')
     @pytest.mark.parametrize("env,source", [
         (1, g.mainnet_HD), (2, g.mainnet_HD),
         (2, g.dev_HD), (1, g.dev_HD),
@@ -88,9 +91,10 @@ class TestMock:
             self.genesis_page.wallet_msg(name=random_text, pwd=password, HD=False)  # 普通钱包
             self.genesis_page.finish_import()
             assert self.home_page.export_private_key(password) == source['private_key']
-        except:
+        finally:
             self.home_page.allure_save_img('test_03')
 
+    @allure.title('通过私钥导入成普通钱包')
     @pytest.mark.parametrize("env,source", [
         (1, g.mainnet_HD), (2, g.mainnet_HD),
         (2, g.dev_HD), (1, g.dev_HD),
@@ -111,9 +115,10 @@ class TestMock:
             self.genesis_page.wallet_msg(random_text, password)
             self.genesis_page.finish_import()
             assert self.home_page.export_private_key(password) == source['private_key']
-        except:
+        finally:
             self.home_page.allure_save_img('test_04')
 
+    @allure.title('通过keystore导入成普通钱包')
     @pytest.mark.parametrize("env,source", [
         (1, g.mainnet_HD), (2, g.mainnet_HD),
         (2, g.dev_HD), (1, g.dev_HD),
@@ -134,9 +139,10 @@ class TestMock:
             self.genesis_page.wallet_msg(random_text, password, keystore=True)
             self.genesis_page.finish_import()
             assert self.home_page.export_private_key(password) == source['private_key']
-        except:
+        finally:
             self.genesis_page.allure_save_img('test_05')
 
+    @allure.title('通过地址导入成观察者钱包')
     @pytest.mark.parametrize("env,source", [
         (1, g.mainnet_HD), (2, g.mainnet_HD),
         (2, g.dev_HD), (1, g.dev_HD),
@@ -155,9 +161,10 @@ class TestMock:
             self.genesis_page.import_wallet()
             self.home_page.import_by_observer(addr=source['address'])
             assert self.home_page.check_observer_tag() is True
-        except:
+        finally:
             self.genesis_page.allure_save_img('test_06')
 
+    @allure.title('遍历HD钱包私钥')
     @pytest.mark.parametrize("env,source", [
         (1, g.mainnet_HD), (2, g.mainnet_HD),
         (2, g.dev_HD), (1, g.dev_HD),
@@ -184,9 +191,10 @@ class TestMock:
                 for i in self.home_page.traverse_HDwallet_privatekey(password):
                     set_global_atrr(key=f'pri_{i[0:4]}', value=i, truncate=False)
                 self.home_page.swipe_wallet_list()
-        except:
+        finally:
             self.genesis_page.allure_save_img('test_07')
 
+    @allure.title('普通钱包之间互导')
     @pytest.mark.parametrize("env,source", [
         (1, g.mainnet), (2, g.mainnet),
         (2, g.dev), (1, g.dev),
@@ -208,5 +216,5 @@ class TestMock:
             self.genesis_page.wallet_msg(random_text, password, HD=True)  # 是否硬钱包
             self.genesis_page.finish_import()
             assert self.home_page.export_private_key(password) == source['private_key']
-        except:
+        finally:
             self.genesis_page.allure_save_img('test_08')

@@ -1,7 +1,10 @@
 import json
+import os
 
 
-def set_global_atrr(key, value, filepath='./data/global_var.py', truncate=True):
+def set_global_atrr(key, value,
+                    filepath=os.path.abspath(os.path.join(os.path.dirname(__file__), '../data/global_var.py')),
+                    truncate=True):
     """
     写入文件
     :param key: 变量Key

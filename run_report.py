@@ -28,5 +28,5 @@ class RunReport(AppiumServer):
 
 
 if __name__ == '__main__':
-    R = RunReport(root=r'C:\Users\juzix\PycharmProjects\ATON-Tests\testcase\z_mock_test.py')
+    R = RunReport(root=os.path.abspath(os.path.join(__file__, '../testcase/z_mock_test.py')))
     R.generate_report().open_report()
