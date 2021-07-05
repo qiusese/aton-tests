@@ -49,7 +49,7 @@ class TestMock:
             self.genesis_page.wallet_msg('test', password, HD=HD)  # 是否硬钱包
             self.genesis_page.finish_create_wallet()
             self.genesis_page.backup_wallet()
-            self.home_page.cancel_install()  # 取消升级
+            # self.home_page.cancel_install()  # 取消升级
             assert self.genesis_page.check_login_success() is True
 
             # 第二步获取钱包的信息，并写入
@@ -63,7 +63,7 @@ class TestMock:
         """升级为新版本，覆盖安装"""
         try:
             # self.driver.remove_app(Base.android_driver_caps['appPackage'])
-            self.driver.install_app(os.path.abspath(os.path.join(os.path.dirname(__file__), "../data/Aton1.0.1.apk")))
+            self.driver.install_app(os.path.abspath(os.path.join(os.path.dirname(__file__), "../data/Aton1.0.2.apk")))
             assert self.genesis_page.is_toast_exist('正在自动升级')
         finally:
             self.genesis_page.allure_save_img('test_02')

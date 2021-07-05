@@ -43,3 +43,15 @@ class TestDelegation:
         finally:
             self.delegation_page.h5page_back()
 
+    def test_04_delegate(self, password):
+        """委托"""
+        # 缺少进入委托主页面
+        self.delegation_page.into_validator_node()
+        self.delegation_page.findall_validators()
+        self.delegation_page.into_validator_detail()
+        self.delegation_page.delegate()
+        self.delegation_page.delegate_amount(amount=10, pwd=password)
+
+    def test_05_claim_rewards(self, password):
+        """领取委托奖励"""
+        self.delegation_page.claim_all_rewards(password)

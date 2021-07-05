@@ -103,7 +103,7 @@ class GenesisPage(Base):
 
     def input_keystore(self, ks):
         # 输入Keystore
-        self.click_text('钱包文件(.json)')
+        self.click_text('钱包文件')
         self.input_element(self.keystore_input, ks, mark='输入keystore')
 
     def input_observer(self, addr):
@@ -141,4 +141,5 @@ class GenesisPage(Base):
 
     def check_login_success(self):
         # 检测登录成功
+        time.sleep(1)
         return self.element_display(self.collect_btn)

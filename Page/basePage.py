@@ -160,7 +160,7 @@ class Base:
         """截图并保存"""
         filename = picname + '.png'
         filepath = os.path.abspath(os.path.join(os.path.dirname(__file__), f"../images/{filename}"))
-        logger.exception(f'报错！！！截图路径：： {filepath}')
+        logger.warning(f'截图路径：： {filepath}')
         self.driver.get_screenshot_as_file(filepath)
         return filepath
 
@@ -263,6 +263,10 @@ class Base:
             return result
         except:
             return False
+
+    def get_element_value(self, el, name='text'):
+        # 返回元素的属性值
+        return self.find_Element(el).get_attribute(name)
 
 
 if __name__ == '__main__':

@@ -132,7 +132,7 @@ class HomePage(Base):
         self.click_element(self.back_btn, mark='返回')
 
     def traverse_HDwallet_privatekey(self, pwd):
-        """遍历HD钱包的私钥"""
+        # 遍历HD钱包的私钥
         for i in range(6):
             self.click_element(self.wallet_list_btn, mark='选择钱包')
             self.wait_element(el=self.HD_btn, duration=2, frequency=0.4).click()
@@ -145,7 +145,7 @@ class HomePage(Base):
             yield self.export_private_key(pwd)
 
     def traverse_HDwallet_keystore(self, pwd):
-        """遍历HD钱包的keystore"""
+        # 遍历HD钱包的keystore
         for i in range(6):
             self.click_element(self.wallet_list_btn, mark='选择钱包')
             self.wait_element(el=self.HD_btn, duration=2, frequency=0.4).click()
@@ -158,7 +158,7 @@ class HomePage(Base):
             yield self.export_keystore(pwd)
 
     def swipe_wallet_list(self):
-        """HD钱包地址列表下，滑动"""
+        # HD钱包地址列表下，滑动
         self.click_element(self.wallet_list_btn, mark='选择钱包')
         self.wait_element(el=self.HD_btn, duration=2, frequency=0.4).click()
         self.swipe_up(duration=1000)
