@@ -53,12 +53,18 @@ class GenesisPage(Base):
         time.sleep(0.5)
         self.driver.tap([(234, 324), (438, 561)], 500)  # 点击屏幕
 
-    def wallet_msg(self, name, pwd, HD=False, book=True, keystore=False):
+    def wallet_msg(self, name, pwd, HD=False, book=True, source=False):
+        """
+        :param HD: 是否硬钱包
+        :param book: 是否加入地址簿
+        :param source: 是否从首页添加
+        :return:
+        """
         # 第三步：钱包信息
         self.select_wallet_type(HD)
         self.input_element(self.wallet_name_input, name, mark='输入钱包名')
         self.input_element(self.pwd_input, pwd, mark='输入密码')
-        if not keystore:
+        if not source:
             self.input_element(self.confirm_pwd_input, pwd, mark='确认密码')
         self.add_address_book(book)
 

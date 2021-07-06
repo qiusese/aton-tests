@@ -136,7 +136,7 @@ class TestMock:
             self.genesis_page.switch_env(enviroment=env)
             self.genesis_page.import_wallet()
             self.genesis_page.input_keystore(source['keystore'].strip('/'))
-            self.genesis_page.wallet_msg(random_text, password, keystore=True)
+            self.genesis_page.wallet_msg(random_text, password, source=True)
             self.genesis_page.finish_import()
             assert self.home_page.export_private_key(password) == source['private_key']
         finally:

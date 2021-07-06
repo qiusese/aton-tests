@@ -46,6 +46,7 @@ class HomePage(Base):
     delete_wallet_btn = (By.ID, 'tv_delete')
     cancel_install_btn = (By.ID, 'text_cancel')
     observer_text = (By.ID, 'tv_observed_wallet_tag')
+    submit_import_btn = (By.ID, 'sbtn_import')
 
     def cancel_install(self):
         self.click_element(self.cancel_install_btn, mark='跳过升级')
@@ -173,10 +174,11 @@ class HomePage(Base):
     def import_by_keystore(self, name, keystore, pwd):
         # 导入keystore
         self.import_wallet()
-        self.click_text('钱包文件(.json)')
+        self.click_text('钱包文件')
         self.input_element(self.keystore_input, keystore, mark='输入keystore')
         self.input_element(self.wallet_name_input, name, mark='输入钱包名')
         self.input_element(self.pwd_input, pwd, mark='输入密码')
+        self.click_element(self.submit_import_btn,mark='开始导入')
 
     def import_by_observer(self, addr):
         # 导入观察者钱包
@@ -194,6 +196,8 @@ class HomePage(Base):
 
     def import_wallet(self):
         # 首页-导入钱包
+        if self.element_display(self.confirm_btn):
+            self.click_element(self.confirm_btn, mark='知道了')
         self.click_element(self.more_btn, mark='点击更多')
         self.click_element(self.import_wallet_btn, mark='导入钱包')
 
