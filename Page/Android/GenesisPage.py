@@ -34,6 +34,7 @@ class GenesisPage(Base):
     next_step_btn = (By.ID, 'sc_next')
     complete_wallet_btn = (By.ID, 'sbtn_finish')
     mnemonic_btn = (By.ID, 'et_mnemonic1')
+    iv_guide_btn = (By.ID, 'iv_guide')
 
     def finish_contract(self, con=True):
         # 第一步：勾选协议
@@ -51,7 +52,8 @@ class GenesisPage(Base):
         # 第二步：导入钱包
         self.click_element(self.import_wallet_btn, mark='导入钱包')
         time.sleep(0.5)
-        self.driver.tap([(234, 324), (438, 561)], 500)  # 点击屏幕
+        # self.driver.tap([(234, 324), (438, 561)], 500)  # 点击屏幕
+        self.click_element(self.iv_guide_btn, mark='点击引导图蒙层-知道了')
 
     def wallet_msg(self, name, pwd, HD=False, book=True, source=False):
         """
@@ -97,6 +99,8 @@ class GenesisPage(Base):
 
     def input_mnemonics(self, words: list):
         # 输入助记词
+        # self.click_element(self.import_wallet_btn, mark='导入钱包')
+        # self.click_element(self.iv_guide_btn, mark='点击引导图蒙层-知道了')
         for i in range(len(words)):
             mnemonic = (By.ID, f'et_mnemonic{i + 1}')
             self.input_element(mnemonic, words[i], mark='输入12个助记词')

@@ -2,7 +2,7 @@ from appium import webdriver
 from Page.Android.GenesisPage import GenesisPage
 from Page.basePage import Base
 import pytest
-from data.data import password, words
+from data.data import password, words, keystore, privatekey, observer_address
 
 
 class TestGenesis:
@@ -40,13 +40,45 @@ class TestGenesis:
         2.导入HD钱包
         """
         self.genesis_page.finish_contract()
+        self.genesis_page.import_wallet()
         self.genesis_page.input_mnemonics(list(words))
         self.genesis_page.wallet_msg(name=random_text, pwd=password, HD=HD)
         self.genesis_page.finish_import()
         assert self.genesis_page.check_login_success() is True
 
+    def test_03_import_keystore(self, random_text):
+        """
+        通过keysore钱包文件导入钱包
+        """
+        self.genesis_page.finish_contract()
+        self.genesis_page.import_wallet()
+        self.genesis_page.input_keystore(keystore)
+        self.genesis_page.wallet_msg(name=random_text, pwd=password, source=True)
+        self.genesis_page.finish_import()
+        # assert self.genesis_page.check_login_success() is True
+
+    def test_04_import_privatekey(self, random_text):
+        """
+        通过私钥导入钱包
+        """
+        self.genesis_page.finish_contract()
+        self.genesis_page.import_wallet()
+        self.genesis_page.input_privatekey(privatekey)
+        self.genesis_page.wallet_msg(name=random_text, pwd=password)
+        self.genesis_page.finish_import()
+        # assert self.genesis_page.check_login_success() is True
+
+    def test_05_import_observer(self):
+        """
+        导入观察钱包
+        """
+        self.genesis_page.finish_contract()
+        self.genesis_page.import_wallet()
+        self.genesis_page.input_observer(observer_address)
+        self.genesis_page.finish_import()
+
     @pytest.mark.parametrize("HD,env", [(False, 1), (False, 2), (False, 3)])
-    def test_03_switch_wallet_env(self, random_text, HD, env):
+    def test_06_switch_wallet_env(self, random_text, HD, env):
         """
         切换环境，创建钱包
         """
