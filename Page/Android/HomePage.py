@@ -47,6 +47,8 @@ class HomePage(Base):
     cancel_install_btn = (By.ID, 'text_cancel')
     observer_text = (By.ID, 'tv_observed_wallet_tag')
     submit_import_btn = (By.ID, 'sbtn_import')
+    change_password_confirm_btn = (By.ID, 'sbtn_confirm')
+    change_password_success_text = (By.ID, 'text_content')
 
     def cancel_install(self):
         self.click_element(self.cancel_install_btn, mark='跳过升级')
@@ -83,6 +85,7 @@ class HomePage(Base):
 
     def delete_wallet(self, pwd):
         # 删除钱包
+        self.click_element(self.manage_wallet_btn, mark='管理钱包')
         self.click_element(self.delete_wallet_btn, mark='删除钱包')
         self.pwd_author(pwd)
 
@@ -219,10 +222,11 @@ class HomePage(Base):
         self.click_element(self.edit_pwd_btn, mark='修改密码')
         self.input_element(self.pwd_btn, old_pwd, mark='输入老的密码')
         self.click_element(self.confirm_btn, mark='确认')
+        time.sleep(2)
 
         self.input_element(self.pwd_btn, new_pwd, mark='输入新的密码')
         self.input_element(self.edit_repeat_pwd_input, new_pwd, mark='确认密码')
-        self.click_element(self.confirm_btn, mark='确认')
+        self.click_element(self.change_password_confirm_btn, mark='确认')
 
     def cancel_backup(self):
         # 取消备份钱包

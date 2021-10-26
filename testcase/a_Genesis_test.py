@@ -75,7 +75,7 @@ class TestGenesis:
         self.genesis_page.finish_contract()
         self.genesis_page.import_wallet()
         self.genesis_page.input_observer(observer_address)
-        self.genesis_page.finish_import()
+        # self.genesis_page.finish_import()
 
     @pytest.mark.parametrize("HD,env", [(False, 1), (False, 2), (False, 3)])
     def test_06_switch_wallet_env(self, random_text, HD, env):

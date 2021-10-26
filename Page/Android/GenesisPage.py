@@ -53,7 +53,9 @@ class GenesisPage(Base):
         self.click_element(self.import_wallet_btn, mark='导入钱包')
         time.sleep(0.5)
         # self.driver.tap([(234, 324), (438, 561)], 500)  # 点击屏幕
-        self.click_element(self.iv_guide_btn, mark='点击引导图蒙层-知道了')
+        # self.click_element(self.iv_guide_btn, mark='点击引导图蒙层-知道了')
+        if self.element_display(self.iv_guide_btn):
+            self.click_element(self.iv_guide_btn, mark='点击引导图蒙层-知道了')
 
     def wallet_msg(self, name, pwd, HD=False, book=True, source=False):
         """
@@ -67,6 +69,7 @@ class GenesisPage(Base):
         self.input_element(self.wallet_name_input, name, mark='输入钱包名')
         self.input_element(self.pwd_input, pwd, mark='输入密码')
         if not source:
+            self.hide_keyboard()
             self.input_element(self.confirm_pwd_input, pwd, mark='确认密码')
         self.add_address_book(book)
 
@@ -99,8 +102,6 @@ class GenesisPage(Base):
 
     def input_mnemonics(self, words: list):
         # 输入助记词
-        # self.click_element(self.import_wallet_btn, mark='导入钱包')
-        # self.click_element(self.iv_guide_btn, mark='点击引导图蒙层-知道了')
         for i in range(len(words)):
             mnemonic = (By.ID, f'et_mnemonic{i + 1}')
             self.input_element(mnemonic, words[i], mark='输入12个助记词')
@@ -121,9 +122,9 @@ class GenesisPage(Base):
         self.click_text('观察钱包')
         self.input_element(self.observer_input, addr, mark='输入观察者地址')
         self.click_element(self.complete_wallet_btn, mark='点击完成')
-        if self.is_toast_exist('钱包已存在'):
-            print('钱包已存在！！！请勿重复导入.')
-            self.click_element(self.left_back_btn, mark='返回首页')
+        # if self.is_toast_exist('钱包已存在'):
+        #     print('钱包已存在！！！请勿重复导入.')
+        #     self.click_element(self.left_back_btn, mark='返回首页')
 
     def finish_import(self):
         # 第四步：完成导入

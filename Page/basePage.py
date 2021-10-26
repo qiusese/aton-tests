@@ -202,6 +202,7 @@ class Base:
             logger.exception('等待超时，找不到该toast提示.', t)
             return False
 
+
     # def switch_to_view(self, target='H5'):
     #     """
     #     切换app视窗 或 h5视窗
@@ -267,6 +268,13 @@ class Base:
     def get_element_value(self, el, name='text'):
         # 返回元素的属性值
         return self.find_Element(el).get_attribute(name)
+
+    def hide_keyboard(self):
+        """收起键盘"""
+        try:
+            self.driver.hide_keyboard()
+        except:
+            return False
 
 
 if __name__ == '__main__':
