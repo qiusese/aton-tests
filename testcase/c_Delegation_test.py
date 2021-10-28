@@ -1,6 +1,9 @@
 from appium import webdriver
 from Page.Android.DelegationPage import DelegationPage
+from Page.Android.GenesisPage import GenesisPage
 from Page.basePage import Base
+from data.data import password
+import time
 
 
 class TestDelegation:
@@ -13,6 +16,9 @@ class TestDelegation:
         self.driver = webdriver.Remote('http://localhost:4723/wd/hub', Base.android_driver_caps)  # 串联
         self.driver.implicitly_wait(5)  # 等待初始化完成
         self.delegation_page = DelegationPage(self.driver)
+        self.genesis_page = GenesisPage(self.driver)
+        self.delegation_page.choose_delegate_index()
+
 
     def teardown_class(self):
         self.driver.quit()
@@ -43,15 +49,23 @@ class TestDelegation:
         finally:
             self.delegation_page.h5page_back()
 
-    def test_04_delegate(self, password):
+    def test_04_delegate(self):
         """委托"""
-        # 缺少进入委托主页面
-        self.delegation_page.into_validator_node()
+        self.delegation_page.choose_nodelist_tab()
         self.delegation_page.findall_validators()
         self.delegation_page.into_validator_detail()
         self.delegation_page.delegate()
         self.delegation_page.delegate_amount(amount=10, pwd=password)
+        msg = self.delegation_page.get_transaction_status_text()
+        assert msg == "确认中"
 
-    def test_05_claim_rewards(self, password):
+    def test_05_claim_rewards(self):
         """领取委托奖励"""
         self.delegation_page.claim_all_rewards(password)
+        time.sleep(5)
+
+    def test_06_withdraw(self):
+        """赎回委托"""
+        self.delegation_page.withdraw(password)
+        msg = self.delegation_page.get_transaction_status_text()
+        assert msg == "确认中"

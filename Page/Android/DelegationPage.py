@@ -9,6 +9,8 @@ class DelegationPage(Base):
     """
 
     index_btn = (By.ID, 'iv_navigation')
+    delegate_index_btn = (By.XPATH, '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.support.v4.widget.DrawerLayout/android.widget.LinearLayout/android.widget.TabHost/android.widget.LinearLayout/android.widget.TabWidget/android.widget.LinearLayout[2]')
+    nodelist_tab_btn = (By.XPATH, '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.support.v4.widget.DrawerLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.HorizontalScrollView/android.widget.LinearLayout/android.widget.RelativeLayout[2]/android.widget.TextView')
     total_delegation_amount_text = (By.ID, 'tv_total_delegated_amount')
     unclaim_reward_amount_text = (By.ID, 'tv_total_unclaimed_reward_amount')
     delegation_records_btn = (By.ID, 'tv_delegation_rec')
@@ -39,15 +41,27 @@ class DelegationPage(Base):
     delegate_status_text = (By.ID, 'tv_transaction_status_desc')
     claim_rewards_btn = (By.ID, 'tv_claim_reward')
     undelegate_btn = (By.ID, 'tv_undelegate')
-    claim_rewards_input = (By.ID, 'et_withdraw_amount')
+    withdraw_amount_input = (By.ID, 'et_withdraw_amount')
     withdraw_btn = (By.ID, 'btn_withdraw')
-    cofirm_btn = (By.ID, 'sbtn_confirm')
+    claim_confirm_btn = (By.ID, 'sbtn_confirm')
+
+    def choose_delegate_index(self):
+        # 点击底部 委托 tab
+        self.click_element(self.delegate_index_btn)
+
+    def choose_nodelist_tab(self):
+        # 点击验证节点列表tab
+        self.click_element(self.nodelist_tab_btn)
 
     def choose_index(self, index=1):
         # 点击底部的index
         page_index = self.find_Elements(self.index_btn, mark='底部index')
         page_index[index].click()
         time.sleep(0.5)
+
+    def get_transaction_status_text(self):
+        transaction_status_msg = self.get_text(self.transaction_status_text)
+        return transaction_status_msg
 
     def enter_problem(self):
         # 进入常见问题
@@ -83,7 +97,7 @@ class DelegationPage(Base):
 
     def delegate(self):
         # 委托
-        self.into_validator_detail()
+        # self.into_validator_detail()
         self.click_element(self.delegate_btn, mark='委托')
         self.driver.tap([(100, 20), (100, 60), (100, 100)], 500)  # 点击屏幕，跳过“知道了”提示
 
@@ -102,6 +116,7 @@ class DelegationPage(Base):
         self.input_element(self.pwd_input, pwd, mark='输入密码')
         self.click_element(self.confirm_btn, mark='确认')
 
+
     def get_delegate_result(self):
         # 获取委托后的订单结果
         return self.get_element_value(el=self.delegate_status_text)
@@ -112,17 +127,17 @@ class DelegationPage(Base):
         claim_list[index].click()
         time.sleep(0.5)
         self.driver.tap([(100, 20), (100, 60), (100, 100)], 500)  # 点击屏幕，跳过“知道了”提示
-        self.input_element(self.claim_rewards_input, mark='领取委托奖励金额')
+        self.input_element(self.withdraw_amount_input, mark='领取委托奖励金额')
         self.click_element(self.withdraw_btn, mark='提取奖励')
         self.input_element(self.pwd_input, pwd, mark='输入密码')
         self.click_element(self.confirm_btn, mark='确认')
 
-    def claim_all_rewards(self, pwd, index=1):
+    def claim_all_rewards(self, pwd, index=0):
         # 验证人详情页--领取奖励（all）
         claim_list = self.find_Elements(self.claim_rewards_btn)
         claim_list[index].click()
-        self.click_element(self.confirm_btn, mark='确认')
-        self.click_element(self.withdraw_btn, mark='提取奖励')
+        self.click_element(self.claim_confirm_btn, mark='确认')
+        # self.click_element(self.withdraw_btn, mark='提取奖励')
         self.input_element(self.pwd_input, pwd, mark='输入密码')
         self.click_element(self.confirm_btn, mark='确认')
 
@@ -130,3 +145,12 @@ class DelegationPage(Base):
         # 右划到验证人节点页面
         self.driver.tap([(100, 20), (100, 60), (100, 100)], 500)  # 点击屏幕，跳过“知道了”提示
         self.Swipe(x1=1 / 4, y1=1 / 2, x2=3 / 4, y2=1 / 2)
+
+    def withdraw(self, pwd, index=0):
+        self.click_element(self.delegator_detail_btn, mark='委托详情')
+        undelegate_list = self.find_Elements(self.undelegate_btn)
+        undelegate_list[index].click()
+        self.input_element(self.withdraw_amount_input, 10, mark="赎回数量")
+        self.click_element(self.withdraw_btn, mark='赎回')
+        self.input_element(self.pwd_input, pwd, mark='输入密码')
+        self.click_element(self.confirm_btn, mark='确认')
